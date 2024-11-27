@@ -1,0 +1,53 @@
+if Value then
+         -- Enable ESP
+         for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+               createRedBox(player)
+            end
+         end
+
+         -- Monitor new players joining
+         game.Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function()
+               createRedBox(player)
+            end)
+         end)
+      else
+         -- Disable ESP
+         for _, player in ipairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("RedBox") then
+               player.Character.RedBox:Destroy()
+            end
+         end
+      end
+   end, -- <-- This was missing
+})
+
+-- Function to create a red box around a player
+function createRedBox(player)
+   if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+      -- Ensure no duplicate ESP
+      if player.Character:FindFirstChild("RedBox") then
+         player.Character.RedBox:Destroy()
+      end
+
+      -- Get the bounding box size of the player's model (entire character)
+      local character = player.Character
+      local lowerPart = character:FindFirstChild("LowerTorso") or character:FindFirstChild("HumanoidRootPart")
+      local upperPart = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Head")
+
+      if lowerPart and upperPart then
+         local boxSize = upperPart.Position - lowerPart.Position
+         -- Create ESP Box
+         local box = Instance.new("BoxHandleAdornment")
+         box.Name = "RedBox"
+         box.Parent = character
+         box.Adornee = character.HumanoidRootPart
+         box.Size = Vector3.new(4, boxSize.Y + 3, 4) -- Adjust box size to fit the character
+         box.Color3 = Color3.new(1, 0, 0) -- Red color
+         box.AlwaysOnTop = true
+         box.ZIndex = 10
+         box.Transparency = 0.5
+      end
+   end
+end
